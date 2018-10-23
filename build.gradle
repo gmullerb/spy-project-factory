@@ -1,0 +1,50 @@
+//  Copyright (c) 2018 Gonzalo Müller Bravo.
+//  Licensed under the MIT License (MIT), see LICENSE.txt
+
+plugins {
+  id 'all.shared.gradle.project-style-checker' version '1.0.2'
+  id 'java'
+  id 'jacoco'
+  id 'pmd'
+}
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  compile gradleApi()
+  compile 'org.mockito:mockito-core:+'
+  testCompile 'org.junit.jupiter:junit-jupiter-api:+'
+  testRuntime 'org.junit.jupiter:junit-jupiter-engine:+'
+}
+
+// Plugin settings
+//////////////////
+
+baseStyleConfig.back.complement(checkstyle)
+
+pmd {
+  toolVersion = PMD_VERSION
+  consoleOutput = true
+}
+baseStyleConfig.back.complement(pmd)
+
+// Task settings
+////////////////
+
+assemble {
+  dependsOn += ['assessCommon', 'assessGradle', 'checkstyleMain', 'checkstyleTest', 'pmdMain', 'pmdTest']
+}
+
+test {
+  // Test task settings
+  useJUnitPlatform()
+  // gradle task settings
+  finalizedBy jacocoTestReport, jacocoTestCoverageVerification
+}
+
+// Default task
+///////////////
+
+defaultTasks 'build'
